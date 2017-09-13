@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 import org.json.simple.JSONObject;
 
-public class TClientCMD2 {
+public class ClientCMD {
 	private static final long serialVersionUID = 1L;
 	private Socket socket;
 	private DataInputStream in;
@@ -19,7 +19,7 @@ public class TClientCMD2 {
 
 	private Scanner scan = new Scanner(System.in);
 
-	public TClientCMD2() {
+	public ClientCMD() {
 		connect();
 		MessageHandler mHandler = new MessageHandler(socket);
 		id = mHandler.id;

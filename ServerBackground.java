@@ -20,13 +20,13 @@ import org.json.simple.parser.ParseException;
 
 import javax.sound.midi.Receiver;
 
-import test.server.TServerLog;
+import test.server.ServerLog;
 
-public class TServerBackground {
+public class ServerBackground {
 	private ServerSocket serverSocket;
 	private Socket socket;
-	private TServerGUI gui;
-	private TServerLog log = new TServerLog();
+	private ServerGUI gui;
+	private ServerLog log = new ServerLog();
 
 	private JSONObject jsonObject = new JSONObject();
 	private JSONParser parser = new JSONParser();
@@ -57,25 +57,25 @@ public class TServerBackground {
 	}
 
 	public static void main(String[] args) {
-		TServerBackground tsb = new TServerBackground();
-		tsb.setting();
-		tsb.writeLog();
+		ServerBackground sb = new ServerBackground();
+		sb.setting();
+		sb.writeLog();
 	}
 
 	public void setting(){
 		try {
-			Collections.synchronizedMap(clientMap); // HashMap 네트워크 화
-			Collections.synchronizedMap(conMap); // 접속 목록 맵
-			serverSocket = new ServerSocket(5432); // 서버 소켓 할당
+			Collections.synchronizedMap(clientMap); // HashMap being network
+			Collections.synchronizedMap(conMap); // Connected client list map
+			serverSocket = new ServerSocket(5432); // Setting Server socket port
 			
 			while (true) {
 				System.out.println("Wait for connect...");
-				socket = serverSocket.accept(); // 유저 소켓에게 접속 허락
+				socket = serverSocket.accept(); // Accept user socket be connected
 
-				System.out.println("Connect from " + socket.getInetAddress()); // 접속 IP
+				System.out.println("Connect from " + socket.getInetAddress()); // Connect IP
 
-				Receiver receiver = new Receiver(socket); // 유저 소켓에 리시버 할당
-				receiver.start(); // 리시버 시작
+				Receiver receiver = new Receiver(socket); // Make Receiver for each user
+				receiver.start(); // Start thread
 				viewUserList(serverId);
 				gui.listArea.setText(userList);
 			}
@@ -85,21 +85,21 @@ public class TServerBackground {
 	}
 
 	public void addClient(String id, DataOutputStream out) throws IOException {
-		getTime(); // 현재시간 가져오기
-		String message = id + "님이 접속하셨습니다. " + ioTime;
-		clientMap.put(id, out); // 유저맵에 객체 등록
-		systemMsg(message); // 모두에게 메세지 전송
-		conMap.put(id, ioTime); // 접속 목록에 아이디와 접속시간 등록
+		getTime(); // Get current time
+		String message = id + " is login at " + ioTime;
+		clientMap.put(id, out); // Put ID and DataOutputStream in clientMap
+		systemMsg(message); // Send Message to all user
+		conMap.put(id, ioTime); // Put ID and current time in conMap(for connected user list map)
 		log.debug(message);
 	}
 
 	public void removeClient(String id){
 		getTime();
-		String message = id + "님이 접속을 종료하셨습니다. " + ioTime;
+		String message = id + " is logout at " + ioTime;
 		systemMsg(message);
 		gui.appendMsg(message);
-		clientMap.remove(id); // 유저맵에 객체 삭제
-		conMap.remove(id); // 접속 목록에서 삭제
+		clientMap.remove(id); // Remove user from clientMap
+		conMap.remove(id); // Remove user from conMap
 		try{
 			socket.close();
 		} catch (IOException e) {
@@ -109,7 +109,7 @@ public class TServerBackground {
 	}
 
 	public void messageToAll(String id, String msg) {
-		Iterator<String> iterator = clientMap.keySet().iterator(); // 유저맵에서 유저의 키값 전부 찾음
+		Iterator<String> iterator = clientMap.keySet().iterator();
 		String key = "", message="";
 		while(iterator.hasNext()) {
 			key = iterator.next();
@@ -132,13 +132,13 @@ public class TServerBackground {
 			key = iterator.next();
 			if(key.equalsIgnoreCase(target)) {
 				try{
-					String message = id + "님의 귓속말 : " + msg;
+					String message = "Whisper from " + id + " : " + msg;
 					clientMap.get(target).writeUTF(message);
 
-					String myMessage = target + "에게 귓속말 : " + msg;
+					String myMessage = "Whisper to " + target + " : " + msg;
 					clientMap.get(id).writeUTF(myMessage);
 
-					mTOmessage = id + "가 " + target + "에게 귓속말 : " + msg;
+					mTOmessage = "[MTO] From" + id + " to " + target + " : " + msg;
 				} catch (IOException e) {
 					System.out.println("Failed to messageToOne method");
 					e.printStackTrace();
@@ -161,14 +161,14 @@ public class TServerBackground {
 			System.out.println("receiveMessage - parsing jsonObject");
 
 			if (message.length() > 6) {
-				msgType = message.substring(1, 5); // 'user' 찾기
+				msgType = message.substring(1, 5); // Find 'user'
 				System.out.println("msgType : " + msgType);
-				userNum = message.substring(5, 6); // 만약 'user'라면 몇번 유저를 찾는건지
+				userNum = message.substring(5, 6); // If 'user',
 				System.out.println("userNum : " + userNum);
-				mtoMsg = message.substring(7); // 'user'면 7번째 문자부터 추출해서 메세지 만들기
+				mtoMsg = message.substring(7); // Make massager
 				System.out.println("mtoMsg : " + mtoMsg);
 			} else {
-				msgType = message.substring(1, message.length()); // 'exit, list' 찾기
+				msgType = message.substring(1, message.length()); // Find 'exit, list'
 				System.out.println("msgType : " + msgType);
 			}
 			System.out.println("finish substring");
@@ -204,7 +204,7 @@ public class TServerBackground {
 	public void viewUserList (String id) {
 		Iterator<String> iterator = conMap.keySet().iterator();
 		String key = "", list="";
-		list = "**현재 접속중인 클라이언트 목록** \n";
+		list = "**Current connected User List** \n";
 		while(iterator.hasNext()) {
 			key = iterator.next();
 			list += key + " / " + conMap.get(key) + "\n";
@@ -215,7 +215,7 @@ public class TServerBackground {
 		} else {
 			try{
 				clientMap.get(id).writeUTF(list);
-				log.debug(id + "가 접속 목록 호출");
+				log.debug(id + " called connected user list");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -247,7 +247,7 @@ public class TServerBackground {
 			key = iterator.next();
 			if(key == id){
 				try {
-					String wcMsg = "[환영합니다] 당신의 아이디 : " + id + "  / 접속시간 : " + conMap.get(key) + "\n";
+					String wcMsg = "[Wellcome] Your ID : " + id + "  / Connect Time : " + conMap.get(key) + "\n";
 					clientMap.get(key).writeUTF(wcMsg);
 					viewUserList(id);
 				} catch (IOException e) {
@@ -269,18 +269,18 @@ public class TServerBackground {
 		private DataInputStream in;
 		private DataOutputStream out;
 		private String id;
-		private TServerBackground tsb = new TServerBackground();
+		private ServerBackground sb = new ServerBackground();
 
 		public Receiver(Socket socket) {
 			try {
 				in = new DataInputStream(socket.getInputStream());
 				out = new DataOutputStream(socket.getOutputStream());
 				setID();
-				id = tsb.id;
+				id = sb.id;
 				out.writeUTF(id);
 				addClient(id, out);
 				wellcomeMsg(id);
-				log.debug(id + "에게 ID부여 및 리시버 할당");
+				log.debug(id + "is connect");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

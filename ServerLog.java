@@ -4,15 +4,15 @@ import java.io.*;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-public class TServerLog {
+public class ServerLog {
 	String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
 	
-	String logFile = "C://Java//test//server//log//chat_log_" + today + ".log";
+	String logFile = "C://log//chat_log_" + today + ".log";
 
 	FileWriter fw;
 	static final String ENTER = System.getProperty("line.separator");
 
-	public TServerLog() {
+	public ServerLog() {
 		try {
 			fw = new FileWriter(logFile, true);
 		} catch (IOException e) {

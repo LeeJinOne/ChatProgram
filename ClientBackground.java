@@ -7,11 +7,11 @@ import java.net.Socket;
 
 import org.json.simple.JSONObject;
 
-public class TClientBackground {
+public class ClientBackground {
 	Socket socket;
 	DataInputStream in;
 	DataOutputStream out;
-	private TClientGUI gui;
+	private ClientGUI gui;
 
 	private String msg;
 	private String id;
@@ -23,8 +23,8 @@ public class TClientBackground {
 	}
 
 	public static void main(String[] args) {
-		TClientBackground tcb = new TClientBackground();
-		tcb.connect();
+		ClientBackground cb = new ClientBackground();
+		cb.connect();
 	}
 
 	public void connect() {

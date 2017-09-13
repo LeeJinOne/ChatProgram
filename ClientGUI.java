@@ -14,19 +14,19 @@ import javax.swing.JScrollPane;
 
 import org.json.simple.JSONObject;
 
-public class TClientGUI extends JFrame implements ActionListener {
+public class ClientGUI extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JTextArea textArea = new JTextArea(40, 25);
 	private JTextArea idArea = new JTextArea(1, 20); // ID값이 표시되는 곳
 	private JTextField textField = new JTextField(25);
 	private JScrollPane scrollPane = new JScrollPane(textArea);
-	private Font font = new Font("돋움", Font.PLAIN, 20);
+	private Font font = new Font("Serif", Font.PLAIN, 20);
 
-	private TClientBackground tcb = new TClientBackground();
+	private ClientBackground cb = new ClientBackground();
 	private String msg;
 	String id;
 
-	public TClientGUI() {
+	public ClientGUI() {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 		setSize(600,600);
@@ -41,12 +41,12 @@ public class TClientGUI extends JFrame implements ActionListener {
 		textArea.setFont(font);
 		textField.setFont(font);
 
-		tcb.setGui(this);
-		tcb.connect();
+		cb.setGui(this);
+		cb.connect();
 	}
 
 	public static void main(String[] args) {
-		new TClientGUI();
+		new ClientGUI();
 	}
 
 	@Override
@@ -60,19 +60,26 @@ public class TClientGUI extends JFrame implements ActionListener {
 
 			String message = jsonObject.toJSONString();
 
-			tcb.sendMessage(message);
+			cb.sendMessage(message);
 			try{
-				tcb.out.flush();
-				tcb.in.close();
-				tcb.out.close();
-				tcb.socket.close();
-
+				cb.out.flush();
+				cb.in.close();
+				cb.out.close();
+				cb.socket.close();
+				/* Do I change code in 'try'? */
 			} catch (IOException ie) {
 				ie.printStackTrace();
 			}
-		  	System.out.println("Socket Connected : " + tcb.socket.isConnected());
-			System.out.println("Socket Closed : " + tcb.socket.isClosed() + "\n");
-			System.exit(0);
+		  	System.out.println("Socket Connected : " + cb.socket.isConnected());
+			System.out.println("Socket Closed : " + cb.socket.isClosed() + "\n");
+			System.exit(0); // <=== **Delete this code**
+		/* ================================================= */
+		/* These are where I want to recode and do something */
+		} else if (msg.equalsIgnoreCase("-reconnect")) {
+			ClientBackground cb = new ClientBackground();
+			cb.reconnect();
+		/* ================================================= */
+		/* ================================================= */
 		} else {
 			JSONObject jsonObject = new JSONObject();
 
@@ -81,7 +88,7 @@ public class TClientGUI extends JFrame implements ActionListener {
 
 			String message = jsonObject.toJSONString();
 
-			tcb.sendMessage(message);
+			cb.sendMessage(message);
 		}
 		textField.setText("");
 	}
