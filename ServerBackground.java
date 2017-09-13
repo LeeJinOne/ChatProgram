@@ -52,7 +52,7 @@ public class ServerBackground {
 		id = nick;
 	}
 
-	public void setGui(TServerGUI gui) {
+	public void setGui(ServerGUI gui) {
 		this.gui = gui;
 	}
 
@@ -72,12 +72,16 @@ public class ServerBackground {
 				System.out.println("Wait for connect...");
 				socket = serverSocket.accept(); // Accept user socket be connected
 
-				System.out.println("Connect from " + socket.getInetAddress()); // Connect IP
-
-				Receiver receiver = new Receiver(socket); // Make Receiver for each user
-				receiver.start(); // Start thread
-				viewUserList(serverId);
-				gui.listArea.setText(userList);
+				if(socket != null){
+ 					if(socket.isConnected()){
+ 						System.out.println("Connect from " + socket.getInetAddress()); // Connect IP
+ 						
+ 						Receiver receiver = new Receiver(socket); // Make Receiver for each user
+ 						receiver.start(); // Start thread
+ 						viewUserList(serverId);
+ 						gui.listArea.setText(userList);
+ 					}
+ 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

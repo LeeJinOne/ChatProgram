@@ -18,7 +18,7 @@ public class ClientBackground {
 
 	private JSONObject jsonObject = new JSONObject();
 
-	public void setGui(TClientGUI gui) {
+	public void setGui(ClientGUI gui) {
 		this.gui = gui;
 	}
 

@@ -72,7 +72,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 			}
 		  	System.out.println("Socket Connected : " + cb.socket.isConnected());
 			System.out.println("Socket Closed : " + cb.socket.isClosed() + "\n");
-			System.exit(0); // <=== **Delete this code**
+			// System.exit(0); // <=== **Delete this code**
 		/* ================================================= */
 		/* These are where I want to recode and do something */
 		} else if (msg.equalsIgnoreCase("-reconnect")) {
